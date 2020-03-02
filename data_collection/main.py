@@ -6,6 +6,7 @@ from data_collection.util import dfcolumnstonumeric
 from data_collection.bootstrap import Bootstrap
 from data_collection.player import Player
 from utils import timer
+from tqdm import tqdm
 import os
 
 
@@ -28,7 +29,6 @@ class Main:
             '3': 'MID',
             '4': 'FWD'
         }
-        self.counter = 0
 
     def get_feature_vector(self, player_id):
         player = Player(player_id)
@@ -38,13 +38,11 @@ class Main:
         d = player.get_player_overall()
         feature_vector = pd.concat([d, c, a, b], axis=1).fillna(method='ffill')
         feature_vector['n_games'] = len(feature_vector.index) if feature_vector.opposition.values[0] != 0 else 0
-        self.counter += 1
-        print('{}% complete'.format(round((self.counter / len(self.player_ids) * 100), 2)))
         return pd.DataFrame(feature_vector.mean(axis=0)).transpose()
 
     @timer
     def get_features(self, new):
-        feature_vectors = [self.get_feature_vector(int(player_id)) for player_id in self.player_ids]
+        feature_vectors = [self.get_feature_vector(int(player_id)) for player_id in tqdm(self.player_ids)]
         data = pd.concat(feature_vectors, sort=False)
         data['time'] = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now())
         data['time'] = pd.to_datetime(data['time'])
@@ -52,7 +50,6 @@ class Main:
         return data.set_index('entry_id')
 
     def get_player_response(self, player_id):
-        print(player_id)
         player = Player(player_id, bootstrap=False)
         n_games = int(self.features[
             (self.features.time == max(self.features.time)) & (self.features.id == player_id)]['n_games'].values[0])
@@ -64,7 +61,7 @@ class Main:
 
     @timer
     def get_response(self):
-        responses = [self.get_player_response(int(player_id)) for player_id in self.prev_player_ids]
+        responses = [self.get_player_response(int(player_id)) for player_id in tqdm(self.prev_player_ids)]
         indices = self.prev_entry_ids
         return pd.DataFrame({'entry_id': indices, 'points': responses}).set_index('entry_id')
 
@@ -88,7 +85,7 @@ class Main:
 
     @timer
     def update_player_names(self):
-        player_names = [self.updated_player_name_position(player_id) for player_id in self.player_ids]
+        player_names = [self.updated_player_name_position(player_id) for player_id in tqdm(self.player_ids)]
         player_names = np.array(player_names)
         player_names_df = pd.DataFrame({'id': self.player_ids, 'first_name': player_names[:, 0],
                                         'second_name': player_names[:, 1], 'position': player_names[:, 2],
@@ -101,13 +98,14 @@ class Main:
     def get_player_initial_price(self, player_id):
         player = Player(player_id, bootstrap=False)
         try:
-            return player.get_player_history().loc[0, 'value']/10
+            price = player.get_player_history().loc[0, 'value']/10
         except KeyError:
-            return np.nan
+            price = np.nan
+        return price
 
     @timer
     def update_initial_prices(self):
-        prices = [self.get_player_initial_price(player_id) for player_id in self.player_ids]
+        prices = [self.get_player_initial_price(int(player_id)) for player_id in tqdm(self.player_ids)]
         initial_prices = pd.DataFrame({'id': self.player_ids, 'price': prices})
         pickle.dump(initial_prices, open(os.path.abspath(os.path.join(self.base, 'data/initial_prices.sav')), 'wb'))
 
