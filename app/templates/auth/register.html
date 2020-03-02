@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script>
+    function get_teamId_info() {
+        $('#team_id_info').append('<p>1: Navigate to the FPL website, login, and view your points for this week.</p>'
+        + '<p>2: Look at the url in your browser. It should look something like this.</p>'
+        + '<img src="/static/images/team_id.png"><br><br>'
+        + '<p>3: Your Team Id is the number displayed after "entry" and before "event" in the url.</p>');
+        $('#show_teamId').attr('href', '');
+    };
+</script>
+    <h1>Register</h1>
+    <hr>
+    <div class="container" id="team_id_info">
+        <p>Can't find your Team Id? <a id="show_teamId" href="javascript:get_teamId_info();">Here</a>'s how to find it.</p>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endblock %}

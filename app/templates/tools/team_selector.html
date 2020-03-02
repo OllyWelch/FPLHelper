@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type='text/javascript' src="{{ url_for('static', filename='js/tools/team_selector.js') }}"></script>
+
+<h1>
+    Team Selector
+</h1>
+<br>
+<div class="btn-group" role="group">
+    <button class="btn btn-default btn-lg" onclick="location.href = '{{ url_for('tools.custom_transfers') }}';">
+        Custom Transfers</button>
+    <button class="btn btn-default btn-lg" onclick="location.href = '{{ url_for('tools.transfer_recommend') }}';">
+        Transfer Recommender</button>
+</div>
+<hr>
+
+<div id="top_heading"></div>
+
+<br>
+
+<div id="table"></div>
+
+<br>
+
+<div id="heading"></div>
+
+<div id="tableId"></div>
+
+<br>
+<div id="not_right">
+    <h4>Is our data out of date?</h4>
+    <br>
+    <button class="btn btn-md btn-default" onclick="location.href = '{{ url_for('tools.custom_transfers') }}';">Add / Reset Custom Transfers</button>
+</div>
+
+{% endblock %}

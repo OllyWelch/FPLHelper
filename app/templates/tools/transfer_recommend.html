@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tools/transfer_recommend.js') }}"></script>
+
+<h1>
+    Transfer recommender for {{ current_user.username }}:
+</h1>
+<br>
+<div class="btn-group" role="group">
+    <button class="btn btn-default btn-lg" onclick="location.href = '{{ url_for('tools.custom_transfers') }}';">
+        Custom Transfers</button>
+    <button class="btn btn-default btn-lg" onclick="location.href = '{{ url_for('tools.team_selector') }}';">
+        Team Selector</button>
+</div>
+<hr>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Number of Free Transfers</label>
+            <select id="nTrans" class="form-control">
+                <option>1</option>
+            </select>
+        </div>
+        <div id="submit">
+            <a class="btn btn-default btn-md" href="javascript:get_recommended_transfers('#submit');">Get recommended transfers</a>
+        </div>
+    </div>
+</div>
+<br><br>
+<div id="info">
+    <h3>Recommended Transfers</h3>
+    <p>Click a recommended transfer to see your new optimal team selection.</p>
+</div>
+<div id="recommended">
+
+</div>
+<a class="btn btn-default btn-md" id="moreTransfers">Show more</a>
+<br><br>
+<div id="new_stuff">
+    <div id="new_score">
+
+    </div>
+    <div id="new_team">
+
+    </div>
+</div>
+{% endblock %}

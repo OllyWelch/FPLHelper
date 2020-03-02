@@ -1,0 +1,104 @@
+# French translations for PROJECT.
+# Copyright (C) 2020 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-01-29 07:55+0000\n"
+"PO-Revision-Date: 2020-01-29 07:46+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: app/routes.py:90
+msgid "Your changes have been saved."
+msgstr ""
+
+#: app/routes.py:134
+msgid "An error occurred"
+msgstr ""
+
+#: app/routes.py:155
+msgid "New team"
+msgstr ""
+
+#: app/routes.py:166 app/routes.py:190
+msgid "Thread successfully added to forum!"
+msgstr ""
+
+#: app/routes.py:169
+msgid "Please log in to create a thread in the forum!"
+msgstr ""
+
+#: app/routes.py:213
+msgid "Post successfully added to thread!"
+msgstr ""
+
+#: app/routes.py:227
+msgid "Invalid username or password"
+msgstr ""
+
+#: app/routes.py:253
+msgid "Congratulations, you are now a registered user!"
+msgstr ""
+
+#: app/routes.py:267
+msgid "Check your email for the instructions to reset your password"
+msgstr ""
+
+#: app/routes.py:284
+msgid "Your password has been reset."
+msgstr ""
+
+#: app/templates/base.html:37
+msgid "Home"
+msgstr ""
+
+#: app/templates/base.html:40
+msgid "Tools"
+msgstr ""
+
+#: app/templates/base.html:42
+msgid "Team Selector"
+msgstr ""
+
+#: app/templates/base.html:43
+msgid "Transfer Recommender"
+msgstr ""
+
+#: app/templates/base.html:48
+msgid "Forum"
+msgstr ""
+
+#: app/templates/base.html:49
+msgid "About"
+msgstr ""
+
+#: app/templates/base.html:56
+msgid "Register"
+msgstr ""
+
+#: app/templates/base.html:57
+msgid "Login"
+msgstr ""
+
+#: app/templates/base.html:64
+msgid "Profile"
+msgstr ""
+
+#: app/templates/base.html:66
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base.html:98
+msgid "FPLHelper: Created by Olly Welch"
+msgstr ""
+

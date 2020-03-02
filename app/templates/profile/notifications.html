@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://unpkg.com/moment"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/profile/notifications.js') }}"></script>
+
+<h1>Notifications</h1>
+<br>
+<div id="new_notifications"></div>
+
+<div id="old_notifications"></div>
+{% endblock %}

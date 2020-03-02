@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+<title>FPLHelper</title>
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/main/index.js') }}"></script>
+
+<div class="jumbotron">
+    {% if current_user.is_authenticated %}
+  <h1>Welcome to FPLHelper, {{ current_user.username }}!</h1>
+      <p>Helping you get the edge in Fantasy Premier League</p>
+      <p><a class="btn btn-primary btn-lg" href="{{ url_for('main.about') }}" role="button">Learn more</a>
+          <a class="btn btn-primary btn-lg" href="{{ url_for('tools.team_selector') }}" role="button">Team Selector</a>
+          <a class="btn btn-primary btn-lg" href="{{ url_for('tools.transfer_recommend') }}" role="button">Transfer Recommender</a>
+          <a class="btn btn-primary btn-lg" href="{{ url_for('tools.custom_transfers') }}" role="button">Custom Transfers</a>
+      </p>
+    {% else %}
+    <h1>Welcome to FPLHelper!</h1>
+    <p>Helping you get the edge in Fantasy Premier League</p>
+      <p><a class="btn btn-primary btn-lg" href="{{ url_for('main.about') }}" role="button">Learn more</a>
+          <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}" role="button">Register</a>
+          <a class="btn btn-primary btn-lg" href="{{ url_for('auth.login') }}" role="button">Login</a>
+      </p>
+    {% endif %}
+
+</div>
+
+<img id="loading_predictions" src="{{ url_for('static', filename='images/loading.gif') }}">
+
+<div id="main_heading"></div>
+
+<br>
+<div class="row" id="filters">
+    <div class="col-md-4">
+        <h4>Filters:</h4>
+        <div class="form-group">
+            <img src="">
+            <label>Position</label>
+            <select class="filter form-control" name="Position" id="position_filter">
+                <option id="any_pos" value="">Any</option>
+                <option id="gkp" value="GKP">Goalkeeper</option>
+                <option id="def" value="DEF">Defender</option>
+                <option id="mid" value="MID">Midfielder</option>
+                <option id="fwd" value="FWD">Forward</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Team</label>
+            <select class="filter form-control" name="Team" id="team_filter">
+                <option value="">Any</option>
+                <option value="ARS">Arsenal</option>
+                <option value="AVL">Aston Villa</option>
+                <option value="BOU">Bournemouth</option>
+                <option value="BHA">Brighton</option>
+                <option value="BUR">Burnley</option>
+                <option value="CHE">Chelsea</option>
+                <option value="CRY">Crystal Palace</option>
+                <option value="EVE">Everton</option>
+                <option value="LEI">Leicester</option>
+                <option value="LIV">Liverpool</option>
+                <option value="MCI">Man City</option>
+                <option value="MUN">Man United</option>
+                <option value="NEW">Newcastle</option>
+                <option value="NOR">Norwich</option>
+                <option value="SHU">Sheffield United</option>
+                <option value="SOU">Southampton</option>
+                <option value="TOT">Spurs</option>
+                <option value="WAT">Watford</option>
+                <option value="WHU">West Ham</option>
+                <option value="WOL">Wolves</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Minimum Price</label>
+            <select class="filter form-control" name="Min Price" id="min_price_filter">
+                <option value="0">Any</option>
+                <option value="4.0">4.0</option>
+                <option value="4.5">4.5</option>
+                <option value="5.0">5.0</option>
+                <option value="5.5">5.5</option>
+                <option value="6.0">6.0</option>
+                <option value="6.5">6.5</option>
+                <option value="7.0">7.0</option>
+                <option value="7.5">7.5</option>
+                <option value="8.0">8.0</option>
+                <option value="8.5">8.5</option>
+                <option value="9.0">9.0</option>
+                <option value="9.5">9.0</option>
+                <option value="10.0">10.0</option>
+                <option value="10.5">10.5</option>
+                <option value="11.0">11.0</option>
+                <option value="11.5">11.5</option>
+                <option value="12.0">12.0</option>
+                <option value="12.5">12.5</option>
+                <option value="13.0">13.0</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Maximum Price</label>
+            <select class="filter form-control" name="Max Price" id="max_price_filter">
+                <option value="100">Any</option>
+                <option value="4.0">4.0</option>
+                <option value="4.5">4.5</option>
+                <option value="5.0">5.0</option>
+                <option value="5.5">5.5</option>
+                <option value="6.0">6.0</option>
+                <option value="6.5">6.5</option>
+                <option value="7.0">7.0</option>
+                <option value="7.5">7.5</option>
+                <option value="8.0">8.0</option>
+                <option value="8.5">8.5</option>
+                <option value="9.0">9.0</option>
+                <option value="9.5">9.0</option>
+                <option value="10.0">10.0</option>
+                <option value="10.5">10.5</option>
+                <option value="11.0">11.0</option>
+                <option value="11.5">11.5</option>
+                <option value="12.0">12.0</option>
+                <option value="12.5">12.5</option>
+                <option value="13.0">13.0</option>
+            </select>
+        </div>
+        <div id="no_results_div" class="alert alert-info">No results found.</div>
+    </div>
+    <div id="table_div" class="col-md-8">
+        <div id="inside_table_div">
+
+        </div>
+        <div id="buttons">
+            <a class="btn btn-default btn-md" id="moreRows">Show more</a>
+            <a class="btn btn-default btn-md" id="toTop">Back to top</a>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}

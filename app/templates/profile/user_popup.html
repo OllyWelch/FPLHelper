@@ -1,0 +1,18 @@
+<table class="table">
+    <tr>
+        <td width="64" style="border: 0px;"><img src="{{ user.avatar(64) }}"></td>
+        <td style="border: 0px;">
+            <p>
+                {{ user.username }}
+            </p>
+            <p>Team Name:<br /> {{ team_name }}</p>
+            {% if user.about_me %}
+            <p>{{ user.about_me }}</p>
+            {% endif %}
+            {% if user.last_seen %}
+            <p>{{ _('Last seen on') }}:<br/>
+               {{ moment(user.last_seen).format('lll') }}</p>
+            {% endif %}
+        </td>
+    </tr>
+</table>

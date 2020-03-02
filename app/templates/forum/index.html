@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://unpkg.com/moment"></script>
+<script type='text/javascript' src="{{ url_for('static', filename='js/forum/index.js') }}"></script>
+
+<h1>Forum</h1>
+<br>
+<div class="btn-group" role="group">
+    <button id="threads" class="btn btn-lg btn-primary">Threads</button>
+    <button id="all_posts" class="btn btn-lg btn-default">All posts</button>
+</div>
+<hr>
+<div id="show_threads">
+    <h2>Threads</h2>
+    <br>
+    <div class="row">
+        <div class="col col-md-4" id="createThreadButton">
+            {% if current_user.is_anonymous %}
+            <p>Want to add to the discussion?</p>
+            <a class="btn btn-md btn-default" href="{{ url_for('auth.login') }}" role="button">Login</a>
+            <br><br>
+            {% else %}
+            <button class="btn btn-md btn-default" onclick="show_create_thread_form();">Create a Thread</button>
+            {% endif %}
+        </div>
+
+        <span id="createThreadForm" hidden>{{ wtf.quick_form(form) }}</span>
+    </div>
+    <br>
+    <div class="container">
+        {% for thread in threads %}
+        {% include 'forum/_forum_thread.html' %}
+        {% endfor %}
+    </div>
+    <br>
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> Newer threads
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    Older threads <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div id="all_posts_div"></div>
+<div id="see_more_posts"><button class="btn btn-md btn-default">Show more</button></div>
+{% endblock %}

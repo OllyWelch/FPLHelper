@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="{{ url_for('static', filename='js/tools/custom_transfers.js') }}"></script>
+
+<h1>Custom Transfers</h1>
+<br>
+<div class="btn-group" role="group">
+    <button class="btn btn-lg btn-primary" id="transfers_in">Add Transfer</button>
+    <button class="btn btn-lg btn-default" id="transfers_out">View Transfers</button>
+    <button class="btn btn-default btn-lg" onclick="location.href = '{{ url_for('tools.team_selector') }}';">
+        Team Selector</button>
+    <button class="btn btn-default btn-lg" onclick="location.href = '{{ url_for('tools.transfer_recommend') }}';">
+        Transfer Recommender</button>
+</div>
+<hr>
+<div class="remove" id="transfers_table"></div>
+
+<div class="remove" id="remove"></div>
+
+<div class="make" id="out"></div>
+<div class="make" id="in"></div>
+<div class="row make">
+    <div class="col col-md-1" id="confirm"></div>
+    <div class="col col-md-1" id="cancel"></div>
+</div>
+<div class="make" id="choose_in_out">
+    <h4>Choose a player to transfer out:</h4>
+</div>
+<br>
+<div class="make" id="out_table"></div>
+
+<div class="make" id="in_table"></div>
+
+<div class="make" id="show_more"></div>
+
+{% endblock %}

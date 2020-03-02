@@ -1,0 +1,53 @@
+<table class="table table-hover">
+        <tr>
+            <td width="70px">
+                <a href="{{ url_for('profile.profile', username=thread.user.username) }}">
+                    <img src="{{ thread.user.avatar(150) }}" class="img img-thumbnail img-responsive" />
+                </a>
+            </td>
+            <td width="250px">
+                <div id="thread_name{{ thread.id }}">
+                    <h3>{{ thread.name }}</h3>
+                </div>
+                <p><span id="thread_body{{ thread.id }}">{{ thread.body }}</span></p>
+                {% if current_user.username == thread.user.username %}
+                <p>Created by you,
+                    <i>{{ moment(thread.timestamp).fromNow() }}</i></p>
+                {% else %}
+                <p>Created by
+                    <span class="user_popup">
+                        <a href="{{ url_for('profile.profile', username=thread.user.username) }}">
+                            {{ thread.user.username }}
+                        </a>
+                    </span>
+                    <i>{{ moment(thread.timestamp).fromNow() }}</i></p>
+                {% endif %}
+                <p id="count{{ thread.id }}">{{ thread.posts.count() }} post(s)</p>
+                <div id="see_more_{{ thread.id }}">
+                    <p onclick="get_posts({{ thread.id }});"><b>Show posts
+                        <img style="width:15px;height:15px" src="{{ url_for('static', filename='images/down_arrow.png') }}"></b></p>
+                </div>
+            </td>
+            {% if current_user.is_anonymous %}
+            {% else %}
+            <td class="form-group" width="200px">
+                <label for="post_textarea_{{ thread.id }}">Add to the discussion...</label>
+                <textarea class="form-control form-control-sm" id="post_textarea_{{ thread.id }}" rows="4"></textarea>
+                <br>
+                <button type="submit" id="submit_post{{ thread.id }}"
+                        onclick="make_post({{ thread.id }});"
+                        class="btn btn-default mb-2">Submit</button>
+                {% if current_user.username == thread.user.username %}
+            <span id="delete{{ thread.id }}">
+                <button class="btn btn-md btn-default"
+                        onclick="delete_thread({{ thread.id }});">
+                    Delete thread</button>
+            </span>
+            {% endif %}
+            </td>
+            {% endif %}
+
+        </tr>
+ </table>
+<div class="container" id="posts_{{ thread.id }}"></div>
+<br>

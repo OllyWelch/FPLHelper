@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script>
+    $(document).ready(function() {
+        show_getting_started();
+    });
+
+    function show_getting_started() {
+        $('#getting_started').show();
+        $('#the_model').hide();
+        $('#tools').hide();
+        $('#forum').hide();
+        $('#getting_started_nav').addClass('active');
+        $('#the_model_nav').removeClass('active');
+        $('#tools_nav').removeClass('active');
+        $('#forum_nav').removeClass('active');
+    };
+
+    function show_model() {
+        $('#getting_started').hide();
+        $('#the_model').show();
+        $('#tools').hide();
+        $('#forum').hide();
+        $('#getting_started_nav').removeClass('active')
+        $('#the_model_nav').addClass('active');
+        $('#tools_nav').removeClass('active');
+        $('#forum_nav').removeClass('active');
+    };
+
+    function show_tools() {
+        $('#getting_started').hide();
+        $('#the_model').hide();
+        $('#tools').show();
+        $('#forum').hide();
+        $('#getting_started_nav').removeClass('active');
+        $('#the_model_nav').removeClass('active');
+        $('#tools_nav').addClass('active');
+        $('#forum_nav').removeClass('active');
+    };
+
+    function show_forum() {
+        $('#getting_started').hide();
+        $('#the_model').hide();
+        $('#tools').hide();
+        $('#forum').show();
+        $('#getting_started_nav').removeClass('active');
+        $('#the_model_nav').removeClass('active');
+        $('#tools_nav').removeClass('active');
+        $('#forum_nav').addClass('active');
+    };
+</script>
+
+<h1>About</h1>
+<br>
+<ul class="nav nav-tabs">
+    <li id="getting_started_nav" role="presentation" class="active"><a href="javascript:show_getting_started();">
+        Getting Started
+    </a></li>
+    <li id="the_model_nav" role="presentation"><a href="javascript:show_model();">The Model</a></li>
+    <li id="tools_nav" role="presentation"><a href="javascript:show_tools();">Tools</a></li>
+    <li id="forum_nav" role="presentation"><a href="javascript:show_forum();">Forum</a></li>
+</ul>
+<div id="getting_started">
+    <h2>Getting Started</h2>
+    <br>
+    {% if current_user.is_anonymous %}
+    <p>To get started with FPLHelper, <a href="{{ url_for('auth.register') }}">register</a> for an account, or
+        <a href="{{ url_for('auth.login') }}">login</a>!</p>
+    {% else %}
+    <p>Now you have an account with FPLHelper, you can do more than just explore all the predictions the algorithm has
+    made: you can apply them to your team!</p>
+    {% endif %}
+</div>
+
+<div id="the_model">
+    <h2>The Model</h2>
+    <br>
+    <p>The model used to predict the expected points metric is "random forest" regression which you can read more about
+    <a href="https://en.wikipedia.org/wiki/Random_forest" target="_blank">here</a>.</p>
+    <p>The data on which it is modelled is collected from the Fantasy Premier League API and updated on a gameweek by
+    gameweek basis. Naturally, as more data is collected, the model will improve as the season progresses.</p>
+</div>
+
+<div id="tools">
+    <h2>Tools</h2>
+    <br>
+    <h3><a href="{{ url_for('tools.team_selector') }}" style="color:#000000">Team Selector</a></h3>
+    <br>
+    <p>The team selector takes the players you picked last week, and gives an optimal team selection based on the
+    expected points metric. In order to add transfers which you may have already made so that your squad is up to date,
+        please add <i>custom transfers</i>.</p>
+    <hr>
+    <h3><a href="{{ url_for('tools.custom_transfers') }}" style="color:#000000">Custom Transfers</a></h3>
+    <br>
+    <p>The custom transfers tool allows you to add any transfers you have made already, or ones you will potentially make.
+    This allows more accurate team selection through the team selection tool, and transfer recommendation using the transfer
+    recommender tool.</p>
+    <hr>
+    <h3><a href="{{ url_for('tools.transfer_recommend') }}" style="color:#000000">Transfer Recommender</a></h3>
+    <br>
+    <p>The transfer recommender goes through each player in your team, and checks potential transfers and how they
+    change the total expected score for your team. The transfers which improve your expected score the most will be
+    recommended first.</p>
+</div>
+
+<div id="forum">
+    <h3>Using the Forum</h3>
+    <br>
+    <p>The <a href="{{ url_for('forum.index') }}">forum</a> consists of threads, and posts within each thread.</p>
+    <p> <b>Threads</b> are recommended to be created for larger
+        topics, e.g. player selection for the upcoming gameweek.</p>
+    <p><b>Posts</b> within each thread should stay relevant to the topic
+    of the thread! It is a great way to interact with other users, and share advice/talking points.</p>
+</div>
+{% endblock %}
