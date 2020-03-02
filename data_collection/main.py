@@ -5,6 +5,7 @@ import datetime
 from data_collection.util import dfcolumnstonumeric
 from data_collection.bootstrap import Bootstrap
 from data_collection.player import Player
+from utils import timer
 import os
 
 
@@ -41,7 +42,9 @@ class Main:
         print('{}% complete'.format(round((self.counter / len(self.player_ids) * 100), 2)))
         return pd.DataFrame(feature_vector.mean(axis=0)).transpose()
 
-    def get_features(self, feature_vectors, new):
+    @timer
+    def get_features(self, new):
+        feature_vectors = [self.get_feature_vector(int(player_id)) for player_id in self.player_ids]
         data = pd.concat(feature_vectors, sort=False)
         data['time'] = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now())
         data['time'] = pd.to_datetime(data['time'])
@@ -59,9 +62,11 @@ class Main:
             point = 0
         return point
 
-    def get_response(self, player_responses):
+    @timer
+    def get_response(self):
+        responses = [self.get_player_response(int(player_id)) for player_id in self.prev_player_ids]
         indices = self.prev_entry_ids
-        return pd.DataFrame({'entry_id': indices, 'points': player_responses}).set_index('entry_id')
+        return pd.DataFrame({'entry_id': indices, 'points': responses}).set_index('entry_id')
 
     def gameweek_finished(self):
         gameweeks = self.bootstrap.get_event_statuses()
@@ -81,7 +86,9 @@ class Main:
             player_id, columns=['first_name', 'second_name', 'element_type', 'now_cost', 'team']).values.tolist()[0]
         return player_name
 
-    def update_player_names(self, player_names):
+    @timer
+    def update_player_names(self):
+        player_names = [self.updated_player_name_position(player_id) for player_id in self.player_ids]
         player_names = np.array(player_names)
         player_names_df = pd.DataFrame({'id': self.player_ids, 'first_name': player_names[:, 0],
                                         'second_name': player_names[:, 1], 'position': player_names[:, 2],
@@ -98,11 +105,13 @@ class Main:
         except KeyError:
             return np.nan
 
-    def add_initial_prices(self):
+    @timer
+    def update_initial_prices(self):
         prices = [self.get_player_initial_price(player_id) for player_id in self.player_ids]
         initial_prices = pd.DataFrame({'id': self.player_ids, 'price': prices})
         pickle.dump(initial_prices, open(os.path.abspath(os.path.join(self.base, 'data/initial_prices.sav')), 'wb'))
 
+    @timer
     def update_event_statuses(self):
         event_statuses = self.bootstrap.get_event_statuses()
         pickle.dump(event_statuses, open(os.path.abspath(os.path.join(self.base, 'data/event_statuses.sav')), 'wb'))

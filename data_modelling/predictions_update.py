@@ -2,9 +2,11 @@ import pandas as pd
 import pickle
 import joblib
 from data_modelling.data_fetcher import DataFetcher
+from utils import timer
 import os
 
 
+@timer
 def predictions_update():
     # Fetch data from database: we have labelled training data and unlabelled prediction data
     data_fetcher = DataFetcher()

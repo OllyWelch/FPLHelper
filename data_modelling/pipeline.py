@@ -4,10 +4,12 @@ from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestRegressor
 from data_modelling.data_fetcher import DataFetcher
 from data_modelling.pre_scaler import PreScaler
+from utils import timer
 import joblib
 import os
 
 
+@timer
 def pipeline():
     # Fetch data from database: we have labelled training data and unlabelled prediction data
     data_fetcher = DataFetcher()

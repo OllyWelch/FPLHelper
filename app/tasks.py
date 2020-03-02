@@ -2,27 +2,29 @@ from data_collection.main import Main
 from data_modelling.pipeline import pipeline
 from data_modelling.predictions_update import predictions_update
 from data_modelling.data_fetcher import DataFetcher
+from utils import timer
 import pandas as pd
 import pickle
 import os
 
 
+@timer
 def update_data():
+    # find the root directory so we can dump updated data to the data folder
     base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    # fetch features and response from files
     data_fetcher = DataFetcher()
     features = data_fetcher.features
     response = data_fetcher.response
+    # initialise main class
     main = Main()
-    print('Updating event statuses...')
+    # update event statuses
     main.update_event_statuses()
-    print('Event statuses updated.')
-    print('Updating player names...')
-    player_names = [main.updated_player_name_position(player_id) for player_id in main.player_ids]
-    main.update_player_names(player_names)
-    print('Player names updated.')
-    print('Getting initial prices...')
-    main.add_initial_prices()
-    print('Initial prices updated.')
+    # update player names
+    main.update_player_names()
+    # update initial prices of players
+    main.update_initial_prices()
+    # check if the data from the last gameweek is up to date
     print('Checking if last gameweek data is complete...')
     if main.last_gameweek_response_added():
         print('Last gameweek data not complete.')
@@ -31,26 +33,25 @@ def update_data():
         if main.gameweek_finished():
             print('Gameweek finished, proceeding to update data.')
             # get response
-            print("Getting response... \n")
-            responses = [main.get_player_response(int(player_id)) for player_id in main.prev_player_ids]
-            new_response = pd.concat([response, main.get_response(responses)])
-            pickle.dump(new_response, open(os.path.abspath(os.path.join(base, 'data/response.sav')), 'wb'))
-            print("Response successfully updated. \n")
+            new_responses = main.get_response()
+            new_responses = pd.concat([response, new_responses])
+            pickle.dump(new_responses, open(os.path.abspath(os.path.join(base, 'data/response.sav')), 'wb'))
+            print("Response successfully updated.")
             # get features
-            print("Getting features...")
-            # features = get_features()
-            feature_vectors = [main.get_feature_vector(int(player_id)) for player_id in main.player_ids]
-            new_features = pd.concat([features, main.get_features(feature_vectors, new=True)], sort=False)
+            new_features = main.get_features(new=True)
+            new_features = pd.concat([features, new_features], sort=False)
             pickle.dump(new_features, open(os.path.abspath(os.path.join(base, 'data/features.sav')), 'wb'))
             print("Features successfully updated.")
         else:
-            print('Gameweek currently active - no database update performed')
+            print('Gameweek currently active - no data update performed')
     else:
+        # data is added from last gameweek, in this case we update the features
         if main.gameweek_finished():
             print('Last gameweek data complete, getting updated features...')
-            feature_vectors = [main.get_feature_vector(int(player_id)) for player_id in main.player_ids]
-            new_features = main.get_features(feature_vectors, new=False)
+            # retrieve up to date features
+            new_features = main.get_features(new=False)
             print('Updated features retrieved, deleting out of date features...')
+            # remove the latest features and replace with up to date ones
             features = features[features.time < max(features.time)]
             print('Adding new features...')
             new_features = pd.concat([features, new_features], sort=False)
@@ -60,10 +61,9 @@ def update_data():
             print('Next gameweek started, no update done.')
 
 
+@timer
 def update_predictions():
-    print('Updating model...')
+    # update the model
     pipeline()
-    print('Model updated.')
-    print('Updating predictions...')
+    # update the predictions based on the updated model
     predictions_update()
-    print('Predictions updated.')
