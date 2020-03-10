@@ -33,9 +33,11 @@ def predictions():
         columns={'position': 'Position', 'first_name': 'First Name',
                  'second_name': 'Second Name',
                  'expected_points': 'Expected Points'}).to_html(index=False,
-                                                                columns=['Position', 'First Name', 'Second Name', 'Expected Points'],
+                                                                columns=['Position', 'First Name', 'Second Name',
+                                                                         'Expected Points'],
                                                                 classes="table table-striped table-hover table-condensed")
-    return jsonify({'gameweek': gameweek, 'squadName': squad['team_name'], 'squadPredictions': squad['squad_predictions']})
+    return jsonify(
+        {'gameweek': gameweek, 'squadName': squad['team_name'], 'squadPredictions': squad['squad_predictions']})
 
 
 @bp.route('/get_optimal_team', methods=['POST'])
@@ -47,7 +49,8 @@ def get_optimal_team():
     squad_predictions.index = squad_predictions.index.rename('id')
     optimal_team = get_optimal_team_selection(squad_predictions)
     return jsonify({'best_score': optimal_team['best_score'],
-                    'best_team': optimal_team['best_team'].replace({'GKP': 100, 'DEF': 101, 'MID': 102, 'FWD': 103}).sort_values(by=['position'])
+                    'best_team': optimal_team['best_team'].replace(
+                        {'GKP': 100, 'DEF': 101, 'MID': 102, 'FWD': 103}).sort_values(by=['position'])
                    .replace({100: 'GKP', 101: 'DEF', 102: 'MID', 103: 'FWD'}).rename(
                         columns={'position': 'Position', 'first_name': 'First Name',
                                  'second_name': 'Second Name',
@@ -73,10 +76,16 @@ def get_recommended_transfers():
     for transfer in transfers:
         transfer_list.append([transfer.out_id, transfer.in_id])
     recommended = transfer_recommender(team_id, n_trans, transfer_list)
+    rename_dict = {'out_1_first_name': 'Out', 'in_1_first_name': 'In', 'score': 'New expected score'}
+    for i in range(1, n_trans + 1):
+        rename_dict['in_{}_second_name'.format(i)] = ''
+        rename_dict['out_{}_second_name'.format(i)] = ''
+    if n_trans == 2:
+        rename_dict['in_2_first_name'] = ''
+        rename_dict['out_2_first_name'] = ''
     return jsonify({'recommended':
                         recommended.rename(
-                            columns={'out_1_first_name': 'Out', 'out_1_second_name': '', 'in_1_first_name': 'In',
-                                     'in_1_second_name': '', 'score': 'New expected score'}
+                            columns=rename_dict
                         ).to_html(index=False, classes='table table-striped table-hover table-condensed')})
 
 
@@ -93,11 +102,14 @@ def get_new_team():
         transfer_list.append([transfer.out_id, transfer.in_id])
     squad = get_squad_predictions(current_user.team_id, transfer_list)['squad_predictions']
     new_team = choose_transfer(out_id, in_id, squad, predictions)
-    return jsonify({'new_team': new_team['best_team'].replace({'GKP': 100, 'DEF': 101, 'MID': 102, 'FWD': 103}).sort_values(by=['position'])
+    return jsonify({'new_team': new_team['best_team'].replace(
+        {'GKP': 100, 'DEF': 101, 'MID': 102, 'FWD': 103}).sort_values(by=['position'])
                    .replace({100: 'GKP', 101: 'DEF', 102: 'MID', 103: 'FWD'}).rename(
-        columns={'position': 'Position', 'first_name': 'First Name', 'second_name': 'Second Name', 'expected_points': 'Expected Points'}
+        columns={'position': 'Position', 'first_name': 'First Name', 'second_name': 'Second Name',
+                 'expected_points': 'Expected Points'}
     ).to_html(index=False, classes='table table-striped table-hover table-condensed', columns=['Position', 'First Name',
-                                                                                               'Second Name', 'Expected Points']),
+                                                                                               'Second Name',
+                                                                                               'Expected Points']),
                     'best_score': new_team['best_score']})
 
 
@@ -117,7 +129,8 @@ def get_valid_transfers():
     squad_predictions = get_squad_predictions(current_user.team_id, transfer_list)
     current_bank = squad_predictions['bank']
     team_counts = squad_predictions['squad_predictions']['team'].value_counts()
-    player_out = pd.DataFrame(squad_predictions['squad_predictions'].reset_index().iloc[int(request.form['row']), :]).transpose()
+    player_out = pd.DataFrame(
+        squad_predictions['squad_predictions'].reset_index().iloc[int(request.form['row']), :]).transpose()
     new_team_counts = pd.DataFrame(team_counts.subtract(
         player_out['team'].value_counts()).fillna(player_out['team'].value_counts()).fillna(
         team_counts))
@@ -149,18 +162,19 @@ def get_valid_transfers():
     player_out_sp = player_out['SP'].values[0]
     retrieve_predictions = get_predictions()
     other_player_predictions = retrieve_predictions['predictions']
-    valid_players = other_player_predictions[(other_player_predictions.position == player_out.loc[:, 'position'].values[0]) &
-                                             (other_player_predictions.price <= player_out_sp + current_bank) &
-                                             (np.isin(other_player_predictions.team, allowed_teams)) &
-                                             (np.isin(other_player_predictions.index.values,
-                                                         np.setdiff1d(other_player_predictions.index.values,
-                                                                      squad_predictions['squad_predictions'].reset_index()['id'].values)))]
+    valid_players = other_player_predictions[
+        (other_player_predictions.position == player_out.loc[:, 'position'].values[0]) &
+        (other_player_predictions.price <= player_out_sp + current_bank) &
+        (np.isin(other_player_predictions.team, allowed_teams)) &
+        (np.isin(other_player_predictions.index.values,
+                 np.setdiff1d(other_player_predictions.index.values,
+                              squad_predictions['squad_predictions'].reset_index()['id'].values)))]
     return jsonify({'out_id': str(player_out['id'].values[0]), 'validPlayers': valid_players.rename(
         columns={'position': 'Position', 'first_name': 'First Name',
                  'second_name': 'Second Name', 'price': 'Price', 'team': 'Team', 'expected_points': 'Expected Points'}
     ).to_html(classes='table table-striped table-hover table-condensed', columns=['Position', 'Team', 'First Name',
-                                                                                               'Second Name', 'Price',
-                                                                                               'Expected Points']),
+                                                                                  'Second Name', 'Price',
+                                                                                  'Expected Points']),
                     })
 
 
@@ -188,14 +202,15 @@ def get_custom_transfers():
         transfer_list.append([transfer.out_id, transfer.in_id])
     transfers = pd.DataFrame(transfer_list, columns=['Out', 'In']).set_index('Out')
     data_fetcher = DataFetcher()
-    player_names = data_fetcher.player_names.loc[:, ['id', 'first_name', 'second_name']].set_index('id')
+    player_names = data_fetcher.get_player_names().loc[:, ['id', 'first_name', 'second_name']].set_index('id')
     transfers = transfers.join(player_names, on='Out').reset_index(drop=True).rename(columns={
         'first_name': 'Out', 'second_name': ''
     }).set_index('In').join(
         player_names, on='In').reset_index(drop=True).rename(
         columns={'first_name': 'In', 'second_name': ''})
     if len(transfers.index) > 0:
-        return jsonify({'transfers': transfers.to_html(index=False, classes='table table-responsive table-hover table-striped')})
+        return jsonify(
+            {'transfers': transfers.to_html(index=False, classes='table table-responsive table-hover table-striped')})
     return jsonify({'transfers': '<h4>No custom transfers made.</h4><br>'})
 
 

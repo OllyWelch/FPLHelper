@@ -20,18 +20,18 @@ def profile(username):
     transfer_list = []
     for transfer in transfers:
         transfer_list.append([transfer.out_id, transfer.in_id])
-    team = Team(user_object.team_id, 1, transfer_list, name_only=True)
+    team = Team(user_object.team_id, 1, transfer_list)
     n_posts = len(Post.query.filter_by(user_id=user_object.id).all())
     return render_template(
         'profile/profile.html', title='Profile - {}'.format(username),
         user=user_object, transfer_list=pd.DataFrame(transfer_list, columns=['Out', 'In']),
-        team=team, n_posts=n_posts)
+        team_name=team.get_name(), n_posts=n_posts)
 
 
 @bp.route('/profile/<username>/popup')
 def user_popup(username):
     user = User.query.filter_by(username=username).first_or_404()
-    team_name = Team(user.team_id, 1, {}, name_only=True).team_name
+    team_name = Team(user.team_id, 1, {}).get_name()
     return render_template('profile/user_popup.html', user=user, team_name=team_name)
 
 

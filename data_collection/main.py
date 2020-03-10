@@ -1,20 +1,21 @@
 import pandas as pd
 import numpy as np
-import pickle
 import datetime
+from flask import current_app
 from data_collection.util import dfcolumnstonumeric
 from data_collection.bootstrap import Bootstrap
 from data_collection.player import Player
+from data_modelling.data_fetcher import DataFetcher
 from utils import timer
 from tqdm import tqdm
-import os
 
 
 class Main:
 
-    def __init__(self):
-        self.base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        self.features = pickle.load(open(os.path.abspath(os.path.join(self.base, 'data/features.sav')), 'rb'))
+    def __init__(self, manual_engine=None):
+        self.engine = manual_engine if manual_engine else current_app.engine
+        self.data_fetcher = DataFetcher(manual_engine=manual_engine)
+        self.features = self.data_fetcher.get_features()
         self.bootstrap = Bootstrap()
         self.player_ids = self.bootstrap.players_data['id'].values
         self.prev_player_ids = self.features[self.features.time == max(self.features.time)]['id'].values
@@ -93,7 +94,7 @@ class Main:
         player_names_df['position'] = player_names_df['position'].map(self.player_positions)
         player_names_df['price'] = player_names_df['price'].astype(int) / 10
         player_names_df = dfcolumnstonumeric(player_names_df)
-        pickle.dump(player_names_df, open(os.path.abspath(os.path.join(self.base, 'data/player_names.sav')), 'wb'))
+        player_names_df.to_sql('player_names', self.engine, if_exists='replace')
 
     def get_player_initial_price(self, player_id):
         player = Player(player_id, bootstrap=False)
@@ -107,9 +108,9 @@ class Main:
     def update_initial_prices(self):
         prices = [self.get_player_initial_price(int(player_id)) for player_id in tqdm(self.player_ids)]
         initial_prices = pd.DataFrame({'id': self.player_ids, 'price': prices})
-        pickle.dump(initial_prices, open(os.path.abspath(os.path.join(self.base, 'data/initial_prices.sav')), 'wb'))
+        initial_prices.to_sql('initial_prices', self.engine, if_exists='replace')
 
     @timer
     def update_event_statuses(self):
         event_statuses = self.bootstrap.get_event_statuses()
-        pickle.dump(event_statuses, open(os.path.abspath(os.path.join(self.base, 'data/event_statuses.sav')), 'wb'))
+        event_statuses.to_sql('event_statuses', self.engine, if_exists='replace')

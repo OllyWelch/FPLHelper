@@ -263,3 +263,7 @@ data_modelling/model_tuning.py
 # log files
 
 logs/
+
+# serialized data files
+
+data/

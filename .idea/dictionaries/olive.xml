@@ -8,6 +8,7 @@
       <w>columnlist</w>
       <w>columnname</w>
       <w>columnorder</w>
+      <w>dataframe</w>
       <w>dfcolumnstonumeric</w>
       <w>filenames</w>
       <w>firstname</w>
@@ -31,6 +32,7 @@
       <w>playerteam</w>
       <w>pymysql</w>
       <w>rawleaguedata</w>
+      <w>recommender</w>
       <w>regressor</w>
       <w>scaler</w>
       <w>secondname</w>

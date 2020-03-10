@@ -14,6 +14,7 @@ from redis import Redis
 from rq import Queue
 import time
 from config import Config
+from app.tasks import update_predictions
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -45,14 +46,26 @@ def create_app(config_class=Config):
     app.connection = Redis.from_url(app.config['REDIS_URL'])
     app.queue = Queue('fplhelper-tasks', connection=app.connection, default_timeout=3600)
 
+    # Save an initial predictions and next_gameweek file to disk on initial load
+    update_predictions()
+
     def send_task_to_worker():
+        """Scheduled function which sends each task sequentially to a single
+        Redis worker."""
+        # Update data in job1
         print('Data update started...')
         job1 = app.queue.enqueue('app.tasks.update_data', job_timeout=3600)
+
+        # wait until job1 is complete
         while not job1.is_finished:
             time.sleep(1)
         print('Data update completed.')
+
+        # Update model and predictions with job2
         print('Model and predictions updating...')
         job2 = app.queue.enqueue('app.tasks.update_predictions', job_timeout=3600)
+
+        # wait until job2 is complete
         while not job2.is_finished:
             time.sleep(1)
         print('Model and predictions updated.')
@@ -60,6 +73,8 @@ def create_app(config_class=Config):
     scheduler.add_job(func=send_task_to_worker, trigger='interval', minutes=60,
                       id='worker_task',
                       timezone="Europe/London")
+
+    app.engine = db.create_engine(app.config['FPL_DATABASE_URI'], engine_opts={})
 
     from app.blueprints.errors import bp as errors_bp
     app.register_blueprint(errors_bp)

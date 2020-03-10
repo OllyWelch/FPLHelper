@@ -22,3 +22,4 @@ class Config(object):
     ADMINS = ['fplhelperreset@gmail.com']
     LANGUAGES = ['en', 'es', 'fr']
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
+    FPL_DATABASE_URI = os.environ.get('FPL_DATABASE_URL')

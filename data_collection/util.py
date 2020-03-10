@@ -1,11 +1,4 @@
-import json
 import pandas as pd
-
-
-def jprint(obj):
-    # create a formatted string of the Python JSON object
-    text = json.dumps(obj, sort_keys=True, indent=4)
-    print(text)
 
 
 def dfcolumnstonumeric(df):
@@ -16,6 +9,7 @@ def dfcolumnstonumeric(df):
 
 
 def was_home_to_numeric(df):
+    # Map each 'was home' column boolean value to an int64/None type
     categorical_columns = ['was_home_{}'.format(i) for i in [1, 2, 3]]
     for column in categorical_columns:
         df[column] = df[column].map({'True': 1, 'False': 0, 'None': None})
