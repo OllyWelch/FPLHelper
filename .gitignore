@@ -260,6 +260,10 @@ dmypy.json
 
 data_modelling/model_tuning.py
 
+# test file
+
+data_modelling/test.py
+
 # log files
 
 logs/
