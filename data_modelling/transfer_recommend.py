@@ -121,38 +121,33 @@ def transfer_recommender(team_id, n_trans, custom_transfers, manual_engine=None)
 
     # Replace each player id by their name using the player_names table, reindexing each time
     data_fetcher = DataFetcher(manual_engine=manual_engine)
-    names = data_fetcher.get_player_names().set_index('id')
-    for i in range(1, n_trans + 1):
+    names = data_fetcher.get_player_names().set_index('id').loc[:, ['first_name', 'second_name']]
 
+    for i in range(1, n_trans + 1):
+        # set the index on the ids for the i-th transfer
         best_transfers = best_transfers.set_index(['out_{}'.format(i), 'in_{}'.format(i)])
 
-        new_column_list = []
-        for j in range(1, i):
-            new_column_list += ['out_{}_first_name'.format(j), 'out_{}_second_name'.format(j)]
-        for k in range(1, i):
-            new_column_list += ['in_{}_first_name'.format(k), 'in_{}_second_name'.format(k)]
-        new_column_list += ['first_name', 'second_name', 'score'] + \
-                           ['out_{}'.format(j) for j in range(i + 1, n_trans + 1)] + \
-                           ['in_{}'.format(j) for j in range(i + 1, n_trans + 1)]
-
-        best_transfers = best_transfers.join(names, on='out_{}'.format(i)).reindex(
-            columns=new_column_list).rename(
+        # join the players name for the player transferred out
+        best_transfers = best_transfers.join(names, on='out_{}'.format(i)).rename(
             columns={'first_name': 'out_{}_first_name'.format(i), 'second_name': 'out_{}_second_name'.format(i)}
         )
 
-        new_column_list = []
-        for j in range(1, i + 1):
-            new_column_list += ['out_{}_first_name'.format(j), 'out_{}_second_name'.format(j)]
-        for k in range(1, i):
-            new_column_list += ['in_{}_first_name'.format(k), 'in_{}_second_name'.format(k)]
-        new_column_list += ['first_name', 'second_name', 'score'] + \
-                           ['out_{}'.format(j) for j in range(i + 1, n_trans + 1)] + \
-                           ['in_{}'.format(j) for j in range(i + 1, n_trans + 1)]
-        best_transfers = best_transfers.join(names, on='in_{}'.format(i)).reindex(
-            columns=new_column_list).rename(
+        # join the players name for the player transferred in, and reset the index
+        best_transfers = best_transfers.join(names, on='in_{}'.format(i)).rename(
             columns={'first_name': 'in_{}_first_name'.format(i), 'second_name': 'in_{}_second_name'.format(i)}
         ).reset_index()
-    return best_transfers
+
+    # create a list of columns for the final reindexing
+    columnlist = ['out_{}'.format(i) for i in range(1, n_trans + 1)] + ['in_{}'.format(i) for i in range(1, n_trans + 1)]
+
+    for direction in ['out', 'in']:
+        for transfer in range(1, n_trans + 1):
+            columnlist += ['{}_{}_first_name'.format(direction, transfer), '{}_{}_second_name'.format(direction, transfer)]
+
+    columnlist.append('score')
+
+    # return the re-indexed dataframe
+    return best_transfers.reindex(columns=columnlist)
 
 
 def choose_transfer(out_ids, in_ids, current_squad, predictions):

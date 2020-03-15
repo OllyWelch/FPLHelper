@@ -86,14 +86,19 @@ def get_recommended_transfers():
     return jsonify({'recommended':
                         recommended.rename(
                             columns=rename_dict
-                        ).to_html(index=False, classes='table table-striped table-hover table-condensed')})
+                        ).to_html(index=False, classes='table table-striped table-hover table-condensed'),
+                    'n_trans': n_trans})
 
 
 @bp.route('/get_new_team', methods=['POST'])
 @login_required
 def get_new_team():
-    choice, out_id, in_id = int(request.form['choice']), [int(float(request.form['out_id']))], [
-        int(float(request.form['in_id']))]
+    n_trans = int(request.form['n_trans'])
+    if n_trans == 1:
+        out_ids, in_ids = [int(float(request.form['out_id']))], [int(float(request.form['in_id']))]
+    else:
+        out_ids, in_ids = [int(float(request.form['out_id1'])), int(float(request.form['out_id2']))],\
+                                  [int(float(request.form['in_id1'])), int(float(request.form['in_id2']))]
     data = get_predictions()
     predictions = data['predictions']
     transfers = UserTransfer.query.filter_by(user_id=current_user.id).all()
@@ -101,7 +106,7 @@ def get_new_team():
     for transfer in transfers:
         transfer_list.append([transfer.out_id, transfer.in_id])
     squad = get_squad_predictions(current_user.team_id, transfer_list)['squad_predictions']
-    new_team = choose_transfer(out_id, in_id, squad, predictions)
+    new_team = choose_transfer(out_ids, in_ids, squad, predictions)
     return jsonify({'new_team': new_team['best_team'].replace(
         {'GKP': 100, 'DEF': 101, 'MID': 102, 'FWD': 103}).sort_values(by=['position'])
                    .replace({100: 'GKP', 101: 'DEF', 102: 'MID', 103: 'FWD'}).rename(

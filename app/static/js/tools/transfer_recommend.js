@@ -28,14 +28,30 @@ function get_recommended_transfers(srcElem) {
             $(srcElem).html('<a class="btn btn-default btn-md"'
             +' href="javascript:get_recommended_transfers(\'#submit\');">Get recommended transfers</a>');
             $('#recommended').html(response['recommended']);
-            $('#recommended thead th:nth-child(1)').hide();
-            $('#recommended thead th:nth-child(2)').hide();
-            $('#recommended tbody tr').each(function(){
-                $(this).addClass('row' + $(this).index() );
-                $(this).attr("onclick", "get_new_team(" + $(this).index() + ")");
-                $('td:nth-child(1)', this).addClass('out_id' + $(this).index() ).hide();
-                $('td:nth-child(2)', this).addClass('in_id' + $(this).index() ).hide();
-            });
+            if (response['n_trans'] == 1) {
+                $('#recommended thead th:nth-child(1)').hide();
+                $('#recommended thead th:nth-child(2)').hide();
+                $('#recommended tbody tr').each(function(){
+                    $(this).addClass('row' + $(this).index() );
+                    $(this).attr("onclick", "get_new_team(" + $(this).index() + ", " + response['n_trans'] + ")");
+                    $('td:nth-child(1)', this).addClass('out_id' + $(this).index() ).hide();
+                    $('td:nth-child(2)', this).addClass('in_id' + $(this).index() ).hide();
+                });
+            } else {
+                $('#recommended thead th:nth-child(1)').hide();
+                $('#recommended thead th:nth-child(2)').hide();
+                $('#recommended thead th:nth-child(3)').hide();
+                $('#recommended thead th:nth-child(4)').hide();
+                $('#recommended tbody tr').each(function(){
+                    $(this).addClass('row' + $(this).index() );
+                    $(this).attr("onclick", "get_new_team(" + $(this).index() + ", " + response['n_trans'] + ")");
+                    $('td:nth-child(1)', this).addClass('out_id1_' + $(this).index() ).hide();
+                    $('td:nth-child(2)', this).addClass('out_id2_' + $(this).index() ).hide();
+                    $('td:nth-child(3)', this).addClass('in_id1_' + $(this).index() ).hide();
+                    $('td:nth-child(4)', this).addClass('in_id2_' + $(this).index() ).hide();
+                });
+            };
+
             $('#recommended tbody tr').hide();
             $('#recommended tbody tr:lt(10)').addClass('active').show();
              $('#moreTransfers').on('click', function(e) {

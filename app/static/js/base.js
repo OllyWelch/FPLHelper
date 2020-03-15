@@ -61,21 +61,37 @@ function get_sorted_table(destElem, column) {
     });
 };
 
-function get_new_team(choice){
+function get_new_team(choice, n_trans){
     $("html, body").animate({scrollTop: $(document).height()}, 4000);
     $('#new_score').html('<img src="/static/images/loading.gif" style="width:16px;height:16px">');
     $('#new_team').html('');
-    $.post('/tools/get_new_team', {
-        choice: choice,
-        out_id: $('.out_id' + choice).text(),
-        in_id: $('.in_id' + choice).text()
-    }).done(function(response) {
-        $('#new_score').html('<h3>New expected score: ' + response['best_score'] + '</h3><p>New optimal team selection:</p><br>');
-        $('#new_team').html(response['new_team'])
-        $("html, body").animate({scrollTop: $(document).height()}, 1000);
-    }).fail(function() {
-        $('#recommended').text("Error");
-    });
+    if (n_trans == 1) {
+        $.post('/tools/get_new_team', {
+            n_trans: n_trans,
+            out_id: $('.out_id' + choice).text(),
+            in_id: $('.in_id' + choice).text()
+        }).done(function(response) {
+            $('#new_score').html('<h3>New expected score: ' + response['best_score'] + '</h3><p>New optimal team selection:</p><br>');
+            $('#new_team').html(response['new_team'])
+            $("html, body").animate({scrollTop: $(document).height()}, 1000);
+        }).fail(function() {
+            $('#recommended').text("Error");
+        });
+    } else {
+        $.post('/tools/get_new_team', {
+            n_trans: n_trans,
+            out_id1: $('.out_id1_' + choice).text(),
+            out_id2: $('.out_id2_' + choice).text(),
+            in_id1: $('.in_id1_' + choice).text(),
+            in_id2: $('.in_id2_' + choice).text()
+        }).done(function(response) {
+            $('#new_score').html('<h3>New expected score: ' + response['best_score'] + '</h3><p>New optimal team selection:</p><br>');
+            $('#new_team').html(response['new_team'])
+            $("html, body").animate({scrollTop: $(document).height()}, 1000);
+        }).fail(function() {
+            $('#recommended').text("Error");
+        });
+    };
 };
 
 function get_post_html(post) {
