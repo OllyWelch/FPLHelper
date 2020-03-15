@@ -14,7 +14,7 @@ $(document).ready(function() {
                 $('#all_posts_div').append(get_post_html(post));
             });
             $.each(response.threads, function(index, thread) {
-                $('.inner_col' + thread.id).append('<p>In <i>' + thread.name + '</i></p>');
+                $('.inner_col' + thread.id).append('<p>In <i>' + sanitize(thread.name) + '</i></p>');
             });
             $('#see_more_posts').show();
             $('.post:visible').addClass('visible');

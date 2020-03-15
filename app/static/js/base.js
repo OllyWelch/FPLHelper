@@ -4,6 +4,21 @@ $(function () {
   activate_user_popup();
 });
 
+
+function sanitize(string) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  return string.replace(reg, (match)=>(map[match]));
+};
+
+
 function get_sorted_table(destElem, column) {
     $(destElem).html('<img src="/static/images/loading.gif">');
     $.post('/get_sorted_table', {
@@ -82,10 +97,11 @@ function get_post_html(post) {
         + likes_value + '</a></div>'
     };
     return '<div class="post post' + post.thread_id + '" id="post' + post.id + '"><div class="row"><div class="col col-md-1">'
-    + '<a href="/profile/' + post.author + '"><img '
+    + '<a href="/profile/' + sanitize(post.author) + '"><img '
     + 'class="img-thumbnail img-responsive" src=' + post.avatar + '></a></div>'
     + '<div class="col col-md-4 inner_col' + post.thread_id + '"><h4>'
-    + '<span class="user_popup"><a href="/profile/' + post.author + '">' + post.author + '</a></span></h4><p>' + post.body + '</p><p><i>'
+    + '<span class="user_popup"><a href="/profile/' + sanitize(post.author)
+    + '">' + sanitize(post.author) + '</a></span></h4><p>' + sanitize(post.body) + '</p><p><i>'
     + moment(post.timestamp).fromNow() + '</i></p></div><div class="col col-md-4">' + like_button + '<br><br>' + delete_value +
     '</div></div><hr></div>'
 };
@@ -170,11 +186,13 @@ function hide_likes(postId) {
 function get_user_html(username, about, avatar) {
     if (about) {
         return '<div class="row user_like"><div class="col col-md-1"><img class="img img-thumbnail img responsive" src="'
-                + avatar + '"></div><div class="col col-md-4"><h4><span class="user_popup"><a href="/profile/' + username + '">' + username + '</a></h4>'
-                + '</span><p>' + about + '</p></div></div><hr>'
+                + avatar + '"></div><div class="col col-md-4"><h4><span class="user_popup"><a href="/profile/' + sanitize(username)
+                + '">' + sanitize(username) + '</a></h4>'
+                + '</span><p>' + sanitize(about) + '</p></div></div><hr>'
     } else {
         return '<div class="row user_like"><div class="col col-md-1"><img class="img img-thumbnail img responsive" src="'
-                + avatar + '"></div><div class="col col-md-4"><h4><span class="user_popup"><a href="/profile/' + username + '">' + username + '</a></h4>'
+                + avatar + '"></div><div class="col col-md-4"><h4><span class="user_popup"><a href="/profile/' + sanitize(username)
+                + '">' + sanitize(username) + '</a></h4>'
                 + '</span></div></div><hr>'
     };
 };

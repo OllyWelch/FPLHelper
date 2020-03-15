@@ -9,7 +9,7 @@ $(document).ready(function() {
             $('#user_posts').append(get_post_html(post));
         });
         $.each(response.threads, function(index, thread) {
-            $('.inner_col' + thread.id).append('<p>In <i>' + thread.name + '</i></p>');
+            $('.inner_col' + thread.id).append('<p>In <i>' + sanitize(thread.name) + '</i></p>');
         });
         if (Object.keys(response.posts).length > 3) {
             $('#show_more_posts').html('<button class="btn btn-md btn-default">Show more</button>')
@@ -30,6 +30,6 @@ $(document).ready(function() {
         };
 
     }).fail(function() {
-        alert('failure')
+        $('#user_posts').append('<p>Failed to find user posts.</p>');
     });
 });
