@@ -11,7 +11,7 @@ cloud-init==19.4
 command-not-found==0.3
 configobj==5.0.6
 croniter==0.3.31
-cryptography==2.8
+cryptography==3.2
 dnspython==1.16.0
 dominate==2.4.0
 Flask==1.1.1
