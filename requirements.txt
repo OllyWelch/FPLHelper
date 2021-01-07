@@ -35,7 +35,7 @@ joblib==0.14.1
 jsonpatch==1.10
 jsonpointer==1.9
 language-selector==0.1
-lxml==4.5.0
+lxml==4.6.2
 Mako==1.1.0
 MarkupSafe==1.1.1
 numpy==1.18.1
